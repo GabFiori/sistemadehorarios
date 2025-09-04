@@ -1,0 +1,135 @@
+:root {
+    --brand-orange: #F29400;
+    --brand-gray: #707173;
+    --brand-gray-light: #C6C7C8;
+    --font-sans: "Gotham Book", Arial, sans-serif;
+}
+
+body {
+    font-family: var(--font-sans);
+    margin: 0;
+    background: #fff;
+    color: var(--brand-gray);
+}
+
+h1, h2 {
+    font-weight: bold;
+    color: #000;
+}
+
+header.page-header {
+    background: var(--brand-orange);
+    padding: 0.75rem 1rem;
+    color: white;
+}
+header.page-header h1 {
+    margin: 0;
+}
+
+.btn {
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+.btn-primary {
+    background: var(--brand-orange);
+    color: white;
+}
+.btn-secondary {
+    background: var(--brand-gray-light);
+    color: black;
+}
+
+a {
+    color: var(--brand-orange);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1rem;
+}
+table th {
+    background: var(--brand-gray-light);
+    padding: 0.5rem;
+    text-align: left;
+}
+table td {
+    border: 1px solid var(--brand-gray-light);
+    padding: 0.5rem;
+}
+
+form {
+    max-width: 900px;
+    margin: 1rem auto;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #000;
+}
+input[type="text"] {
+    width: 100%;
+    padding: 0.4rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--brand-gray-light);
+    border-radius: 4px;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    background: var(--brand-gray-light);
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.schedule-slot {
+    background: white;
+    border-radius: 4px;
+    border: 2px solid var(--brand-gray-light);
+    padding: 0.5rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+.table-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    background: none;
+    padding: 0;
+}
+
+.table-slot {
+    background: #fff;
+    border: 1px solid var(--brand-gray-light);
+    border-radius: 4px;
+    padding: 4px;
+    text-align: center;
+    font-size: 0.85rem;
+}
+
+.table-slot strong {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+    color: #000;
+}
