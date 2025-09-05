@@ -9,7 +9,7 @@
 </header>
 
 <div class="schedule-grid">
-    @foreach (['segunda', 'terca', 'quarta', 'quinta', 'sexta'] as $dia)
+    @foreach (['segunda', 'terça', 'quarta', 'quinta', 'sexta'] as $dia)
         <div class="schedule-slot">
             <h3>{{ ucfirst($dia) }}</h3>
             @foreach ($campoHorarios->where('dia_semana', $dia) as $slot)

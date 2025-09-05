@@ -17,7 +17,7 @@
     @csrf
     @method('PUT')
     <div class="schedule-grid">
-        @foreach (['segunda', 'terca', 'quarta', 'quinta', 'sexta'] as $dia)
+        @foreach (['segunda', 'terça', 'quarta', 'quinta', 'sexta'] as $dia)
             <div class="schedule-slot">
                 <h3>{{ ucfirst($dia) }}</h3>
 

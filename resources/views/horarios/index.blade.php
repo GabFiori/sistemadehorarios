@@ -34,7 +34,7 @@
                             $horarioOrganizado = $turma->horarios->keyBy('campo_horario_id');
                         @endphp
 
-                        @foreach (['segunda', 'terca', 'quarta', 'quinta', 'sexta'] as $dia)
+                        @foreach (['segunda', 'terça', 'quarta', 'quinta', 'sexta'] as $dia)
                             <div class="schedule-slot table-slot">
                                 <strong>{{ ucfirst($dia) }}</strong>
                                 @foreach ($campoHorarios->where('dia_semana', $dia) as $slot)

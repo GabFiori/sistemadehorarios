@@ -9,7 +9,7 @@ class CampoHorarioSeeder extends Seeder
 {
     public function run(): void
     {
-        $dias = ['segunda', 'terca', 'quarta', 'quinta', 'sexta'];
+        $dias = ['segunda', 'terça', 'quarta', 'quinta', 'sexta'];
         foreach ($dias as $dia) {
             CampoHorario::create(['dia_semana' => $dia, 'posicao' => 1]);
             CampoHorario::create(['dia_semana' => $dia, 'posicao' => 2]);
