@@ -8,11 +8,11 @@
 body {
     font-family: var(--font-sans);
     margin: 0;
-    background: #fff;
+    background: #f4f4f4; /* Mudei um pouco o fundo para destacar os formulários */
     color: var(--brand-gray);
 }
 
-h1, h2 {
+h1, h2, h3 {
     font-weight: bold;
     color: #000;
 }
@@ -67,11 +67,12 @@ table td {
 }
 
 form {
-    max-width: 900px;
+    max-width: 1200px; /* Aumentei a largura máxima para acomodar a grade */
     margin: 1rem auto;
     background: white;
-    padding: 1rem;
+    padding: 1rem 2rem;
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 label {
@@ -80,29 +81,58 @@ label {
     margin-bottom: 0.25rem;
     color: #000;
 }
-input[type="text"] {
+
+/* Estilos para Inputs e Selects */
+input[type="text"],
+select {
     width: 100%;
     padding: 0.4rem;
     margin-bottom: 0.75rem;
     border: 1px solid var(--brand-gray-light);
     border-radius: 4px;
+    box-sizing: border-box; /* Garante que o padding não aumente a largura total */
 }
 
+
+/**********************************************
+* AQUI ESTÁ A CORREÇÃO PRINCIPAL            *
+**********************************************/
 .schedule-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    background: var(--brand-gray-light);
-    padding: 10px;
+    /* Por padrão (telas pequenas), a grade terá apenas 1 coluna */
+    grid-template-columns: 1fr;
+    gap: 20px;
+    background: #f9f9f9;
+    padding: 20px;
     border-radius: 6px;
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
+
+/* Em telas com largura média (ex: tablets), usamos 2 colunas */
+@media (min-width: 768px) {
+    .schedule-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Em telas largas (ex: desktops), usamos as 5 colunas originais */
+@media (min-width: 1200px) {
+    .schedule-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
 .schedule-slot {
     background: white;
     border-radius: 4px;
-    border: 2px solid var(--brand-gray-light);
-    padding: 0.5rem;
+    border: 1px solid var(--brand-gray-light);
+    padding: 1rem;
+}
+
+.schedule-slot select {
+    margin-top: 0.5rem; /* Adiciona um pequeno espaço entre os selects */
+    margin-bottom: 0;
 }
 
 .form-actions {
@@ -112,6 +142,7 @@ input[type="text"] {
 }
 
 .table-grid {
+    display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 5px;
     background: none;

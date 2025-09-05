@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Turma extends Model
+class CampoHorario extends Model
 {
     use HasFactory;
+    public $timestamps = false;
+
     protected $fillable = [
-        'nome',
-        'representante',
+        'dia_semana',
+        'posicao',
     ];
 
     public function horarios()

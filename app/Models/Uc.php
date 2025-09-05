@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Turma extends Model
+class Uc extends Model
 {
     use HasFactory;
     protected $fillable = [
         'nome',
-        'representante',
+        'grupo',
+        'codigo'
     ];
-
     public function horarios()
     {
         return $this->hasMany(Horario::class);
