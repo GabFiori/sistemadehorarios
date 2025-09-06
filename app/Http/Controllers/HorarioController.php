@@ -14,16 +14,14 @@ use Illuminate\Validation\ValidationException;
 
 class HorarioController extends Controller
 {
+    // Métodos públicos (index, create, show, etc.) continuam como antes...
     public function index()
     {
-
         $turmas = Turma::whereHas('horarios')
             ->with('horarios.campoHorario', 'horarios.uc', 'horarios.professor', 'horarios.sala')
             ->orderBy('nome')
             ->get();
-
         $campoHorarios = CampoHorario::all();
-
         return view('horarios.index', compact('turmas', 'campoHorarios'));
     }
 
@@ -34,12 +32,9 @@ class HorarioController extends Controller
         $salas = Sala::orderBy('nome')->get();
         $ucs = Uc::orderBy('nome')->get();
         $campoHorarios = CampoHorario::all();
-
         $horarioAtual = collect();
-
         return view('horarios.create', compact('turmas', 'professores', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
     }
-
 
     public function store(Request $request)
     {
@@ -50,30 +45,8 @@ class HorarioController extends Controller
         DB::beginTransaction();
         try {
             foreach ($alocacoes as $campoHorarioId => $dados) {
-                if (empty($dados['uc_id']) || empty($dados['professor_id']) || empty($dados['sala_id'])) {
-                    continue;
-                }
-                $conflito = Horario::where('campo_horario_id', $campoHorarioId)
-                    ->where(function ($query) use ($dados) {
-                        $query->where('professor_id', $dados['professor_id'])
-                            ->orWhere('sala_id', $dados['sala_id']);
-                    })->first();
-
-                if ($conflito) {
-                    DB::rollBack();
-                    $slot = CampoHorario::find($campoHorarioId);
-                    throw ValidationException::withMessages([
-                        'conflito' => "Conflito em {$slot->dia_semana} na {$slot->posicao}ª aula. O Professor ou a Sala já está alocado(a) para a turma " . $conflito->turma->nome . "."
-                    ]);
-                }
-
-                Horario::create([
-                    'turma_id' => $turma->id,
-                    'campo_horario_id' => $campoHorarioId,
-                    'uc_id' => $dados['uc_id'],
-                    'professor_id' => $dados['professor_id'],
-                    'sala_id' => $dados['sala_id']
-                ]);
+                // A lógica do loop agora chama nossa nova função privada
+                $this->processarSlotDeHorario($turma, $campoHorarioId, $dados, false);
             }
             DB::commit();
         } catch (ValidationException $e) {
@@ -90,7 +63,6 @@ class HorarioController extends Controller
     {
         $campoHorarios = CampoHorario::all();
         $horarioAtual = $turma->horarios()->with('uc', 'professor', 'sala')->get()->keyBy('campo_horario_id');
-
         return view('horarios.show', compact('turma', 'campoHorarios', 'horarioAtual'));
     }
 
@@ -101,7 +73,6 @@ class HorarioController extends Controller
         $ucs = Uc::orderBy('nome')->get();
         $campoHorarios = CampoHorario::all();
         $horarioAtual = $turma->horarios->keyBy('campo_horario_id');
-
         return view('horarios.edit', compact('turma', 'professores', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
     }
 
@@ -112,30 +83,7 @@ class HorarioController extends Controller
         DB::beginTransaction();
         try {
             foreach ($alocacoes as $campoHorarioId => $dados) {
-                if (empty($dados['uc_id']) || empty($dados['professor_id']) || empty($dados['sala_id'])) {
-                    Horario::where('turma_id', $turma->id)->where('campo_horario_id', $campoHorarioId)->delete();
-                    continue;
-                }
-
-                $conflito = Horario::where('campo_horario_id', $campoHorarioId)
-                    ->where('turma_id', '!=', $turma->id)
-                    ->where(function ($query) use ($dados) {
-                        $query->where('professor_id', $dados['professor_id'])
-                            ->orWhere('sala_id', $dados['sala_id']);
-                    })->first();
-
-                if ($conflito) {
-                    DB::rollBack();
-                    $slot = CampoHorario::find($campoHorarioId);
-                    throw ValidationException::withMessages([
-                        'conflito' => "Conflito em {$slot->dia_semana} na {$slot->posicao}ª aula. O Professor ou a Sala já está alocado(a) para a turma " . $conflito->turma->nome . "."
-                    ]);
-                }
-
-                Horario::updateOrCreate(
-                    ['turma_id' => $turma->id, 'campo_horario_id' => $campoHorarioId],
-                    ['uc_id' => $dados['uc_id'], 'professor_id' => $dados['professor_id'], 'sala_id' => $dados['sala_id']]
-                );
+                $this->processarSlotDeHorario($turma, $campoHorarioId, $dados, true);
             }
             DB::commit();
         } catch (ValidationException $e) {
@@ -151,7 +99,55 @@ class HorarioController extends Controller
     public function destroy(Turma $turma)
     {
         Horario::where('turma_id', $turma->id)->delete();
-
         return redirect()->route('horarios.index')->with('success', 'Horário da turma ' . $turma->nome . ' foi limpo.');
+    }
+
+    private function processarSlotDeHorario(Turma $turma, int $campoHorarioId, array $dados, bool $isUpdate): void
+    {
+        $isVago = empty($dados['uc_id']) || empty($dados['professor_id']) || empty($dados['sala_id']);
+
+        if ($isVago) {
+            if ($isUpdate) {
+                Horario::where('turma_id', $turma->id)->where('campo_horario_id', $campoHorarioId)->delete();
+            }
+            return;
+        }
+
+        $this->verificarConflito($turma, $campoHorarioId, $dados, $isUpdate);
+
+        if ($isUpdate) {
+            Horario::updateOrCreate(
+                ['turma_id' => $turma->id, 'campo_horario_id' => $campoHorarioId],
+                ['uc_id' => $dados['uc_id'], 'professor_id' => $dados['professor_id'], 'sala_id' => $dados['sala_id']]
+            );
+        } else {
+            Horario::create([
+                'turma_id' => $turma->id,
+                'campo_horario_id' => $campoHorarioId,
+                'uc_id' => $dados['uc_id'],
+                'professor_id' => $dados['professor_id'],
+                'sala_id' => $dados['sala_id']
+            ]);
+        }
+    }
+
+    private function verificarConflito(Turma $turma, int $campoHorarioId, array $dados, bool $isUpdate): void
+    {
+        $query = Horario::where('campo_horario_id', $campoHorarioId);
+        if ($isUpdate) {
+            $query->where('turma_id', '!=', $turma->id);
+        }
+
+        $conflito = $query->where(function ($q) use ($dados) {
+            $q->where('professor_id', $dados['professor_id'])
+              ->orWhere('sala_id', $dados['sala_id']);
+        })->first();
+
+        if ($conflito) {
+            $slot = CampoHorario::find($campoHorarioId);
+            throw ValidationException::withMessages([
+                'conflito' => "Conflito em {$slot->dia_semana} na {$slot->posicao}ª aula. O Professor ou a Sala já está alocado(a) para a turma " . $conflito->turma->nome . "."
+            ]);
+        }
     }
 }
