@@ -118,7 +118,7 @@ class HorarioController extends Controller
                 }
 
                 $conflito = Horario::where('campo_horario_id', $campoHorarioId)
-                    ->where('turma_id', '!=', $turma->id) 
+                    ->where('turma_id', '!=', $turma->id)
                     ->where(function ($query) use ($dados) {
                         $query->where('professor_id', $dados['professor_id'])
                             ->orWhere('sala_id', $dados['sala_id']);
@@ -146,5 +146,12 @@ class HorarioController extends Controller
         }
 
         return redirect()->route('horarios.index')->with('success', 'Horário da turma ' . $turma->nome . ' atualizado com sucesso!');
+    }
+
+    public function destroy(Turma $turma)
+    {
+        Horario::where('turma_id', $turma->id)->delete();
+
+        return redirect()->route('horarios.index')->with('success', 'Horário da turma ' . $turma->nome . ' foi limpo.');
     }
 }
