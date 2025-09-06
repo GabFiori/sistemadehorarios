@@ -14,7 +14,6 @@ use Illuminate\Validation\ValidationException;
 
 class HorarioController extends Controller
 {
-    // Métodos públicos (index, create, show, etc.) continuam como antes...
     public function index()
     {
         $turmas = Turma::whereHas('horarios')
