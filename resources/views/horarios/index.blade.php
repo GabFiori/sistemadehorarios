@@ -45,7 +45,6 @@
         </div>
 
         <div class="page-actions">
-            <button type="button" class="btn btn-secondary">Exportar</button>
             <a href="{{ route('horarios.create') }}" class="btn btn-primary">Adicionar</a>
         </div>
     </div>
