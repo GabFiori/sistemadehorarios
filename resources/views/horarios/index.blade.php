@@ -1,73 +1,52 @@
 @extends('layouts.app')
 
-@section('title', 'Visão Geral dos Horários')
+@section('title', 'Sistema de Horários')
 
 @section('content')
-<header class="page-header">
-    <h1>Visão Geral dos Horários</h1>
-</header>
+    <header class="page-header">
+        <h1>Sistema de Horários</h1>
+        <div class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo UniFil">
+        </div>
+    </header>
 
-@if (session('success'))
-    <div class="alert alert-success" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-        {{ session('success') }}
-    </div>
-@endif
+    <div class="main-container">
+        @if (session('success'))
+            <div class="alert alert-success"
+                style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 5px; margin-bottom: 2rem;">
+                {{ session('success') }}
+            </div>
+        @endif
 
-<div class="turmas-container" style="padding: 1rem;">
-    <table>
-        <thead>
-            <tr>
-                <th>Nome da Turma</th>
-                <th>Representante</th>
-                <th>Horário Resumido</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
+        <div class="turmas-grid-container">
             @forelse ($turmas as $turma)
-            <tr>
-                <td>{{ $turma->nome }}</td>
-                <td>{{ $turma->representante }}</td>
-                <td>
-                    <div class="schedule-grid table-grid">
+                <a href="{{ route('horarios.show', $turma) }}" class="turma-card">
+                    <h3>{{ $turma->nome }}</h3>
+                    <div class="horario-visual-grid">
                         @php
                             $horarioOrganizado = $turma->horarios->keyBy('campo_horario_id');
                         @endphp
 
-                        @foreach (['segunda', 'terça', 'quarta', 'quinta', 'sexta'] as $dia)
-                            <div class="schedule-slot table-slot">
-                                <strong>{{ ucfirst($dia) }}</strong>
-                                @foreach ($campoHorarios->where('dia_semana', $dia) as $slot)
-                                    @php
-                                        $aula = $horarioOrganizado->get($slot->id);
-                                    @endphp
-                                    <div>
-                                        <small>{{ $aula->uc->nome ?? '---' }}</small>
-                                    </div>
-                                @endforeach
+                        @foreach ($campoHorarios as $slot)
+                            @php
+                                $aula = $horarioOrganizado->get($slot->id);
+                            @endphp
+                            <div class="horario-visual-slot {{ $aula ? 'preenchido' : '' }}">
+                                {{ $aula->uc->nome ?? '' }}
                             </div>
                         @endforeach
                     </div>
-                </td>
-                <td>
-                    <a href="{{ route('horarios.show', $turma) }}" class="btn btn-secondary">Ver</a>
-                    <a href="{{ route('horarios.edit', $turma) }}" class="btn btn-secondary">Editar</a>
-
-                    <form action="{{ route('horarios.destroy', $turma) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja limpar todo o horário desta turma?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Limpar</button>
-                    </form>
-                </td>
-            </tr>
+                </a>
             @empty
-            <tr>
-                <td colspan="4">
-                    <p>Nenhuma turma encontrada. Rode o comando <code>php artisan migrate:fresh --seed</code> para popular o banco de dados.</p>
-                </td>
-            </tr>
+                <div class="alert alert-warning" style="grid-column: 1 / -1;">
+                    <p>Nenhum horário cadastrado no sistema.</p>
+                </div>
             @endforelse
-        </tbody>
-    </table>
-</div>
+        </div>
+
+        <div class="page-actions">
+            <button type="button" class="btn btn-secondary">Exportar</button>
+            <a href="{{ route('horarios.create') }}" class="btn btn-primary">Adicionar</a>
+        </div>
+    </div>
 @endsection

@@ -14,6 +14,7 @@ class MockSeeder extends Seeder
     {
         Turma::create(['nome' => 'E2-2023 Mista', 'representante' => 'Giovanna Kubo']);
         Turma::create(['nome' => 'E3-2023 Mista', 'representante' => 'Marcelly Liechocki']);
+        Turma::create(['nome' => ' E1-2023 Mista', 'representante' => 'Luigi Castoldi Picch']);
         Professor::create(['nome' => 'Eron Ponce Pereira', 'matricula' => '232072001', 'email' => 'eron.ponce@unifil.br']);
         Professor::create(['nome' => 'Robson de Lacerda Zambroti', 'matricula' => '232072002', 'email' => 'robson.lacerda@unifil.br']);
         Professor::create(['nome' => 'Ricardo Petri Silva', 'matricula' => '232072003', 'email' => 'ricardo.petri@unifil.br']);

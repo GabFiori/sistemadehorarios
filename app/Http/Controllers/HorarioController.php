@@ -16,8 +16,9 @@ class HorarioController extends Controller
 {
     public function index()
     {
-        //dd('Cheguei no controller e no método index');
-        $turmas = Turma::with('horarios.campoHorario', 'horarios.uc', 'horarios.professor', 'horarios.sala')
+
+        $turmas = Turma::whereHas('horarios')
+            ->with('horarios.campoHorario', 'horarios.uc', 'horarios.professor', 'horarios.sala')
             ->orderBy('nome')
             ->get();
 
@@ -26,6 +27,64 @@ class HorarioController extends Controller
         return view('horarios.index', compact('turmas', 'campoHorarios'));
     }
 
+    public function create()
+    {
+        $turmas = Turma::orderBy('nome')->get();
+        $professores = Professor::orderBy('nome')->get();
+        $salas = Sala::orderBy('nome')->get();
+        $ucs = Uc::orderBy('nome')->get();
+        $campoHorarios = CampoHorario::all();
+
+        $horarioAtual = collect();
+
+        return view('horarios.create', compact('turmas', 'professores', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
+    }
+
+
+    public function store(Request $request)
+    {
+        $request->validate(['turma_id' => 'required|exists:turmas,id']);
+        $turma = Turma::find($request->input('turma_id'));
+        $alocacoes = $request->input('alocacoes', []);
+
+        DB::beginTransaction();
+        try {
+            foreach ($alocacoes as $campoHorarioId => $dados) {
+                if (empty($dados['uc_id']) || empty($dados['professor_id']) || empty($dados['sala_id'])) {
+                    continue;
+                }
+                $conflito = Horario::where('campo_horario_id', $campoHorarioId)
+                    ->where(function ($query) use ($dados) {
+                        $query->where('professor_id', $dados['professor_id'])
+                            ->orWhere('sala_id', $dados['sala_id']);
+                    })->first();
+
+                if ($conflito) {
+                    DB::rollBack();
+                    $slot = CampoHorario::find($campoHorarioId);
+                    throw ValidationException::withMessages([
+                        'conflito' => "Conflito em {$slot->dia_semana} na {$slot->posicao}ª aula. O Professor ou a Sala já está alocado(a) para a turma " . $conflito->turma->nome . "."
+                    ]);
+                }
+
+                Horario::create([
+                    'turma_id' => $turma->id,
+                    'campo_horario_id' => $campoHorarioId,
+                    'uc_id' => $dados['uc_id'],
+                    'professor_id' => $dados['professor_id'],
+                    'sala_id' => $dados['sala_id']
+                ]);
+            }
+            DB::commit();
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Ocorreu um erro inesperado ao salvar: ' . $e->getMessage())->withInput();
+        }
+
+        return redirect()->route('horarios.index')->with('success', 'Horário da turma ' . $turma->nome . ' criado com sucesso!');
+    }
 
     public function show(Turma $turma)
     {
@@ -59,7 +118,7 @@ class HorarioController extends Controller
                 }
 
                 $conflito = Horario::where('campo_horario_id', $campoHorarioId)
-                    ->where('turma_id', '!=', $turma->id)
+                    ->where('turma_id', '!=', $turma->id) 
                     ->where(function ($query) use ($dados) {
                         $query->where('professor_id', $dados['professor_id'])
                             ->orWhere('sala_id', $dados['sala_id']);
@@ -79,18 +138,13 @@ class HorarioController extends Controller
                 );
             }
             DB::commit();
+        } catch (ValidationException $e) {
+            throw $e;
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Ocorreu um erro inesperado ao salvar: ' . $e->getMessage());
         }
 
         return redirect()->route('horarios.index')->with('success', 'Horário da turma ' . $turma->nome . ' atualizado com sucesso!');
-    }
-
-    public function destroy(Turma $turma)
-    {
-        Horario::where('turma_id', $turma->id)->delete();
-
-        return redirect()->route('horarios.index')->with('success', 'Horário da turma ' . $turma->nome . ' foi limpo.');
     }
 }
