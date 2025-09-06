@@ -44,7 +44,6 @@ class HorarioController extends Controller
         DB::beginTransaction();
         try {
             foreach ($alocacoes as $campoHorarioId => $dados) {
-                // A lógica do loop agora chama nossa nova função privada
                 $this->processarSlotDeHorario($turma, $campoHorarioId, $dados, false);
             }
             DB::commit();
