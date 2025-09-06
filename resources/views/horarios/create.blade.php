@@ -3,16 +3,20 @@
 @section('content')
     <header class="page-header">
         <h1>Criar Novo Horário</h1>
+        <div class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo UniFil">
+        </div>
     </header>
 
     @if ($errors->any())
-    <div class="alert alert-danger" style="background-color: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="alert alert-danger"
+            style="background-color: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px; margin-bottom: 1rem;">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     <form action="{{ route('horarios.store') }}" method="POST">

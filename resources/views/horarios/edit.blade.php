@@ -3,6 +3,9 @@
 @section('content')
     <header class="page-header">
         <h1>Editar Horário: {{ $turma->nome }}</h1>
+        <div class="logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Logo UniFil">
+        </div>
     </header>
 
     @if ($errors->any())
@@ -16,15 +19,15 @@
         </div>
     @endif
 
-        <form action="{{ route('horarios.update', $turma->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+    <form action="{{ route('horarios.update', $turma->id) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-            @include('horarios._form')
+        @include('horarios._form')
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                <a href="{{ route('horarios.index') }}" class="btn btn-secondary">Voltar</a>
-            </div>
-        </form>
-    @endsection
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <a href="{{ route('horarios.index') }}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </form>
+@endsection
