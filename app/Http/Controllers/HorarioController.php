@@ -26,19 +26,30 @@ class HorarioController extends Controller
 
     public function create()
     {
-        $turmas = Turma::orderBy('nome')->get();
-        $professores = Professor::orderBy('nome')->get();
+        $turmas = Turma::doesntHave('horarios')->orderBy('nome')->get();
+
+        $professoresPorDia = $this->getProfessoresAgrupadosPorDia();
+
         $salas = Sala::orderBy('nome')->get();
         $ucs = Uc::orderBy('nome')->get();
         $campoHorarios = CampoHorario::all();
         $horarioAtual = collect();
-        return view('horarios.create', compact('turmas', 'professores', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
+
+        return view('horarios.create', compact('turmas', 'professoresPorDia', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
     }
 
     public function store(Request $request)
     {
         $request->validate(['turma_id' => 'required|exists:turmas,id']);
         $turma = Turma::find($request->input('turma_id'));
+        $alocacoes = $request->input('alocacoes', []);
+
+        if ($turma->horarios()->exists()) {
+            throw ValidationException::withMessages([
+                'turma_id' => 'Esta turma já possui um horário cadastrado. Para alterá-lo, por favor, use a opção "Editar" na tela do horário desta turma'
+            ]);
+        }
+
         $alocacoes = $request->input('alocacoes', []);
 
         DB::beginTransaction();
@@ -66,12 +77,14 @@ class HorarioController extends Controller
 
     public function edit(Turma $turma)
     {
-        $professores = Professor::orderBy('nome')->get();
+        $professoresPorDia = $this->getProfessoresAgrupadosPorDia();
+
         $salas = Sala::orderBy('nome')->get();
         $ucs = Uc::orderBy('nome')->get();
         $campoHorarios = CampoHorario::all();
         $horarioAtual = $turma->horarios->keyBy('campo_horario_id');
-        return view('horarios.edit', compact('turma', 'professores', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
+
+        return view('horarios.edit', compact('turma', 'professoresPorDia', 'salas', 'ucs', 'campoHorarios', 'horarioAtual'));
     }
 
     public function update(Request $request, Turma $turma)
@@ -102,6 +115,7 @@ class HorarioController extends Controller
 
     private function processarSlotDeHorario(Turma $turma, int $campoHorarioId, array $dados, bool $isUpdate): void
     {
+        //verificando se o slot de horário está vago
         $isVago = empty($dados['uc_id']) || empty($dados['professor_id']) || empty($dados['sala_id']);
 
         if ($isVago) {
@@ -110,6 +124,8 @@ class HorarioController extends Controller
             }
             return;
         }
+        //se está vago, verifica se está em função de edição, se sim, ele apaga a aula do database, visto que
+        //o usuário apagou os dados de um slot que talvez antes estivesse preenchido
 
         $this->verificarConflito($turma, $campoHorarioId, $dados, $isUpdate);
 
@@ -138,7 +154,7 @@ class HorarioController extends Controller
 
         $conflito = $query->where(function ($q) use ($dados) {
             $q->where('professor_id', $dados['professor_id'])
-              ->orWhere('sala_id', $dados['sala_id']);
+                ->orWhere('sala_id', $dados['sala_id']);
         })->first();
 
         if ($conflito) {
@@ -147,5 +163,24 @@ class HorarioController extends Controller
                 'conflito' => "Conflito em {$slot->dia_semana} na {$slot->posicao}ª aula. O Professor ou a Sala já está alocado(a) para a turma " . $conflito->turma->nome . "."
             ]);
         }
+    }
+
+    private function getProfessoresAgrupadosPorDia(): array
+    {
+        $todosProfessores = Professor::orderBy('nome')->get(['id', 'nome', 'dias_disponiveis']);
+        $professoresPorDia = [];
+        $diasDaSemana = ['segunda', 'terça', 'quarta', 'quinta', 'sexta'];
+
+        foreach ($todosProfessores as $professor) {
+            $diasDisponiveis = !empty($professor->dias_disponiveis) ? explode(',', $professor->dias_disponiveis) : $diasDaSemana;
+
+            foreach ($diasDisponiveis as $dia) {
+                $diaLimpo = trim(strtolower($dia));
+                if (in_array($diaLimpo, $diasDaSemana)) {
+                    $professoresPorDia[$diaLimpo][] = $professor;
+                }
+            }
+        }
+        return $professoresPorDia;
     }
 }

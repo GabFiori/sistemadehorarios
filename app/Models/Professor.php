@@ -12,7 +12,8 @@ class Professor extends Model
     protected $fillable = [
         'nome',
         'matricula',
-        'email'
+        'email',
+        'dias_disponiveis'
     ];
     public function horarios()
     {

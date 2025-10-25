@@ -14,18 +14,21 @@ class MockSeeder extends Seeder
     {
         Turma::create(['nome' => 'E2-2023 Mista', 'representante' => 'Giovanna Kubo']);
         Turma::create(['nome' => 'E3-2023 Mista', 'representante' => 'Marcelly Liechocki']);
-        Turma::create(['nome' => ' E1-2023 Mista', 'representante' => 'Luigi Castoldi Picch']);
+        Turma::create(['nome' => 'E1-2023 Mista', 'representante' => 'Luigi Castoldi Picch']);
+
+        Professor::create(['nome' => 'Robson de Lacerda Zambroti', 'matricula' => '232072002', 'email' => 'robson.lacerda@unifil.br', 'dias_disponiveis' => 'segunda,terça,sexta']);
+        Professor::create(['nome' => 'Ricardo Petri Silva', 'matricula' => '232072003', 'email' => 'ricardo.petri@unifil.br', 'dias_disponiveis' => 'terça,quarta,quinta']);
+        Professor::create(['nome' => 'Bruno Henrique Coleto', 'matricula' => '232072004', 'email' => 'bruno.coleto@unifil.br', 'dias_disponiveis' => 'segunda,quarta,sexta']);
+        Professor::create(['nome' => 'Wilson Sanches', 'matricula' => '232072005', 'email' => 'wilson.sanches@unifil.br', 'dias_disponiveis' => 'terça,sexta']);
+        Professor::create(['nome' => 'Luiz Nunes', 'matricula' => '232072006', 'email' => 'luiz.nunes@unifil.br', 'dias_disponiveis' => 'segunda,terça,quarta']);
+        Professor::create(['nome' => 'Gustavo Queiroz', 'matricula' => '232072008', 'email' => 'gustavo.queiroz@unifil.br', 'dias_disponiveis' => 'terça,quinta']);
+        Professor::create(['nome' => 'Edson Kaneshima', 'matricula' => '232072009', 'email' => 'edson.kaneshima@unifil.br', 'dias_disponiveis' => 'segunda,sexta']);
+
         Professor::create(['nome' => 'Eron Ponce Pereira', 'matricula' => '232072001', 'email' => 'eron.ponce@unifil.br']);
-        Professor::create(['nome' => 'Robson de Lacerda Zambroti', 'matricula' => '232072002', 'email' => 'robson.lacerda@unifil.br']);
-        Professor::create(['nome' => 'Ricardo Petri Silva', 'matricula' => '232072003', 'email' => 'ricardo.petri@unifil.br']);
-        Professor::create(['nome' => 'Bruno Henrique Coleto', 'matricula' => '232072004', 'email' => 'bruno.coleto@unifil.br']);
-        Professor::create(['nome' => 'Wilson Sanches', 'matricula' => '232072005', 'email' => 'wilson.sanches@unifil.br']);
-        Professor::create(['nome' => 'Luiz Nunes', 'matricula' => '232072006', 'email' => 'luiz.nunes@unifil.br']);
         Professor::create(['nome' => 'Marcelo Yukio Yamamoto', 'matricula' => '232072007', 'email' => 'marcelo.yamamoto@unifil.br']);
-        Professor::create(['nome' => 'Gustavo Queiroz ', 'matricula' => '232072008', 'email' => 'gustavo.queiroz@unifil.br']);
-        Professor::create(['nome' => 'Edson Kaneshima', 'matricula' => '232072009', 'email' => 'edson.kaneshima@unifil.br']);
         Professor::create(['nome' => 'João Vitor da Costa Andrade', 'matricula' => '232082001', 'email' => 'joao.andrade@unifil.br']);
         Professor::create(['nome' => 'Mário Henrique A. Adaniya', 'matricula' => '232082002', 'email' => 'mario.henrique@unifil.br']);
+
         Sala::create(['nome' => 'Lab 2', 'campus' => 'Centro', 'capacidade' => 25]);
         Sala::create(['nome' => 'Lab 3', 'campus' => 'Centro', 'capacidade' => 25]);
         Sala::create(['nome' => 'Lab 4', 'campus' => 'Centro', 'capacidade' => 30]);
@@ -36,6 +39,7 @@ class MockSeeder extends Seeder
         Sala::create(['nome' => '1030', 'campus' => 'Ipolon II', 'capacidade' => 20]);
         Sala::create(['nome' => '1031', 'campus' => 'Ipolon II', 'capacidade' => 30]);
         Sala::create(['nome' => '1032', 'campus' => 'Ipolon II', 'capacidade' => 50]);
+
         Uc::create(['nome' => 'Cálculo Diferencial e Integral: Derivada,Integral e Aplicações I', 'grupo' => '815', 'codigo' => 'MATE230024']);
         Uc::create(['nome' => 'Interação Humano Computador: Desenvolvimento de Design de Interação', 'grupo' => '1019', 'codigo' => 'EGSW230036']);
         Uc::create(['nome' => 'Desenvolvimento com DevOps: Gerenciamento de containers', 'grupo' => '805', 'codigo' => 'INRC230011']);

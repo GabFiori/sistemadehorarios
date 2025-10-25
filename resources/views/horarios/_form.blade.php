@@ -6,15 +6,19 @@
             @foreach ($campoHorarios->where('dia_semana', $dia) as $slot)
                 <div style="margin-bottom: 1rem;">
                     <label>{{ ucfirst($dia) }} - Aula {{ $slot->posicao }}:</label>
+
                     @php
                         $horario_selecionado = $horarioAtual->get($slot->id);
+                        $defaultUcId = $horario_selecionado->uc_id ?? null;
+                        $defaultProfessorId = $horario_selecionado->professor_id ?? null;
+                        $defaultSalaId = $horario_selecionado->sala_id ?? null;
                     @endphp
 
                     <select name="alocacoes[{{ $slot->id }}][uc_id]">
                         <option value="">-- UC --</option>
                         @foreach ($ucs as $uc)
                             <option value="{{ $uc->id }}"
-                                {{ $horario_selecionado && $horario_selecionado->uc_id == $uc->id ? 'selected' : '' }}>
+                                {{ old('alocacoes.' . $slot->id . '.uc_id', $defaultUcId) == $uc->id ? 'selected' : '' }}>
                                 {{ $uc->nome }}
                             </option>
                         @endforeach
@@ -22,9 +26,12 @@
 
                     <select name="alocacoes[{{ $slot->id }}][professor_id]">
                         <option value="">-- Professor --</option>
-                        @foreach ($professores as $professor)
+                        @php
+                            $professoresDisponiveis = $professoresPorDia[$dia] ?? [];
+                        @endphp
+                        @foreach ($professoresDisponiveis as $professor)
                             <option value="{{ $professor->id }}"
-                                {{ $horario_selecionado && $horario_selecionado->professor_id == $professor->id ? 'selected' : '' }}>
+                                {{ old('alocacoes.' . $slot->id . '.professor_id', $defaultProfessorId) == $professor->id ? 'selected' : '' }}>
                                 {{ $professor->nome }}
                             </option>
                         @endforeach
@@ -34,7 +41,7 @@
                         <option value="">-- Sala --</option>
                         @foreach ($salas as $sala)
                             <option value="{{ $sala->id }}"
-                                {{ $horario_selecionado && $horario_selecionado->sala_id == $sala->id ? 'selected' : '' }}>
+                                {{ old('alocacoes.' . $slot->id . '.sala_id', $defaultSalaId) == $sala->id ? 'selected' : '' }}>
                                 {{ $sala->nome }}
                             </option>
                         @endforeach
